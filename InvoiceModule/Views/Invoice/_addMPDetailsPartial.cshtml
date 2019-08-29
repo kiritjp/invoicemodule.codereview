@@ -1,0 +1,365 @@
+﻿@model InvoiceModule.Services.Models.MPDetails
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog" style="opacity: 1;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content" style="top: 227px;">
+            <div class="modal-header" style="display: block;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add MPDetails</h4>
+            </div>
+            <div class="modal-body">
+                <form id="FrmMPDetails" kendo-validator="true">
+                    <div class="row">
+
+                        @*<div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Invoice Id</label>
+                                    @(Html.Kendo().TextBoxFor(m => m.InvoiceId).HtmlAttributes(new { @class = "textboxWidth", title = "Invoice Id", required = "required", validationmessage = "Invoice Id required", disabled = "disabled" }))
+                                </div>
+                            </div>*@
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>ZPTName</label>
+                                @(Html.Kendo().TextBoxFor(m => m.ZptName).HtmlAttributes(new { @class = "textboxWidth", title = "ZPT Name", required = "required", validationmessage = "ZPT Name required" }))
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>MetCode</label>
+                                @(Html.Kendo().TextBoxFor(m => m.AgainstCode).HtmlAttributes(new { @class = "textboxWidth", title = "Met Code", required = "required", validationmessage = "Met Code required" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>MA</label>
+                            <div class="form-group">
+                                @(Html.Kendo().TextBoxFor(m => m.MA).HtmlAttributes(new { @class = "textboxWidth", title = "MA", required = "required", validationmessage = "MA required" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>Von</label>
+                            <div class="form-group">
+                                @(Html.Kendo().DatePickerFor(m => m.MPFrom).HtmlAttributes(new { @class = "textboxWidth", title = "Von" }))
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <label>Bis</label>
+                            <div class="form-group">
+                                @(Html.Kendo().DatePickerFor(m => m.MPTo).HtmlAttributes(new { @class = "textboxWidth", title = "MP To" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>Rpt von</label>
+                            <div class="form-group">
+                                @(Html.Kendo().DatePickerFor(m => m.RptFrom).HtmlAttributes(new { @class = "textboxWidth", title = "RPT Von" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>Rpt Bis</label>
+                            <div class="form-group">
+                                @(Html.Kendo().DatePickerFor(m => m.RptTo).HtmlAttributes(new { @class = "textboxWidth", title = "RPT To" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>Eng Type</label>
+                            <div class="form-group">
+                                @(Html.Kendo().TextBoxFor(m => m.EngType).HtmlAttributes(new { @class = "textboxWidth", title = "Eng Type" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Herkunft</label>
+                                <div class="form-group">
+                                    @(Html.Kendo().TextBoxFor(m => m.Original).HtmlAttributes(new { @class = "textboxWidth", title = "Herkunft" }))
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        @(Html.Kendo().Button().Name("btnMpDetails").HtmlAttributes(new { type = "submit" }).Content("Add"))
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="viewMPDetailsModal" class="modal fade" role="dialog" style="opacity: 1;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content" style="top: 227px;">
+            <div class="modal-header" style="display: block;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">MPDetails</h4>
+            </div>
+            <div class="modal-body" id="viewMPDetailsBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@Html.AntiForgeryToken()
+
+
+@(Html.Kendo().Grid<InvoiceModule.Services.Models.MPDetails>()
+                    .Name("grid")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(column => column).ClientTemplate("<input type='hidden' class='mpdetails' value='#=Id#'/><input type='checkbox' onchange='getSelectedMPItem(#=Id#,this.checked)' />");
+                        columns.Command(command => command.Custom("View").Click("showDetails"));
+                        columns.Bound(column => column.Id).Hidden();
+                        columns.Bound(column => column.InvoiceId).Hidden();
+                        columns.Bound(column => column.MA);
+                        columns.Bound(column => column.Original);
+                        columns.Bound(column => column.ZptName);
+                        columns.Bound(column => column.AgainstCode);
+                        columns.Bound(column => column.MPFrom).Format("{0:MM/dd/yyyy}");
+                        columns.Bound(column => column.MPTo).Format("{0:MM/dd/yyyy}");
+                        columns.Bound(column => column.RptFrom).Format("{0:MM/dd/yyyy}");
+                        columns.Bound(column => column.RptTo).Format("{0:MM/dd/yyyy}");
+                    })
+                    .Sortable()
+                    .Pageable()
+                    .Scrollable()
+                    .ClientDetailTemplateId("template")
+                    .HtmlAttributes(new { style = "height:auto;" })
+                    .ToolBar(toolbar => toolbar.Create())
+                    .Editable(editable => editable.Mode(GridEditMode.PopUp))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(6)
+                        .Read(read => read.Action("GetMPDetailsList", "Invoice", new { invoiceId = @ViewBag.invoiceId }))
+                    )
+                    .Events(events => events.DataBound("dataBound"))
+)
+
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<InvoiceModule.Services.Models.RGDetails>()
+                                      .Name("grid_#=Id#")
+                                      .Columns(columns =>
+                                      {
+                                          columns.Bound(o => o.Id).Title(" ").ClientTemplate("<input type='hidden' class='rgdetails' value='\\#=Id\\#'/><input type='checkbox' id='#=Id#'  class='RGcheckbox' onchange='getSelectedRGItem(\\#=Id\\#,this.checked,this)' />");
+                                          columns.Bound(o => o.Id).Hidden();
+                                          columns.Bound(o => o.MPDetailsId).Hidden();
+                                          columns.Bound(o => o.POS);
+                                          columns.Bound(o => o.SubPOS);
+                                          columns.Bound(o => o.VATExclusive);
+                                          columns.Bound(o => o.VAT);
+                                          columns.Bound(o => o.VATInclusive);
+                                          columns.Bound(o => o.Unit);
+                                      })
+                                      .ToolBar(toolbar => toolbar.Create())
+                                      .DataSource(dataSource => dataSource
+                                      .Ajax()
+                                      .PageSize(10)
+                                      .Read(read => read.Action("GetRGDetailsList", "Invoice", new { mpDetailId = "#=Id#" }))
+                                      )
+                                      .Events(events => events.DataBound("dataBoundRGDetails"))
+                                      .Sortable()
+                                      .ToClientTemplate()
+    )
+</script>
+
+<script>
+    var selectedInvoice = [];
+    var selectedRGDetails = [];
+    var selectedMPDetails = 0;
+
+    function forgeryToken() {
+        return kendo.antiForgeryTokens();
+    }
+
+    function dataBound() {
+        this.expandRow(this.tbody.find("tr.k-master-row").first());
+    }
+
+    function dataBoundRGDetails() {
+        this.expandRow(this.tbody.find("tr.k-master-row").first());
+
+        $.each($(".k-grid.k-widget.k-display-block.k-editable"), function (index, value) {
+            var customRGBtns = `<div style='float:left;'><a href= '#' onClick='openRgModel(this)' id='addBtn_" + index + "' title='Add' ><i class='fa fa-plus' aria-hidden=true></i></a></div> <div class='col-sm-1' style='float:left;'><a href= '#' id='deleteBtn_" + index + "' title='Delete' onClick='checkboxDelete()' ><i class='fa fa-trash-o' aria-hidden=true></i></a></div>`;
+            if (index > 0) {
+                $("#" + value["id"] + " .k-header.k-grid-toolbar").html(customRGBtns);
+            }
+        });
+    }
+
+
+    $(document).ready(function () {
+        var customMPBtns = `<div style='width:600px;' class='justify-content-center align-items-center'>
+                                                            <a href = '#' id = 'addBtn' title = 'Add' >
+                                                                    <i class='fa fa-plus' aria-hidden=true></i>
+                                                            </a>
+                                                            <a href='#' id='deleteBtn' title='Delete'>
+                                                                    <i class='fa fa-trash-o' aria-hidden=true></i>
+                                                            </a>
+                                                            <button id='collapse' class='k-button'>Collapse All</button>
+                                                            <button class='k-button' id='expand'>Expand All</button>
+                                </div>`;
+        $(".k-header.k-grid-toolbar").html(customMPBtns);
+        $("#addBtn").click(function (e) {
+            $("#myModal").modal('show');
+        });
+
+        $("#deleteBtn").click(function () {
+            if (selectedInvoice != null && selectedInvoice.length > 0) {
+                var url = '@Url.Content("~/Invoice/DeleteMPDetails")';
+                $.post(url, { selectedMPIds: selectedInvoice }, function (response) {
+                    $('#grid').data('kendoGrid').dataSource.read();
+                    $("#displayMessage").html(`<div class="alert alert-success" role="alert">
+                                    ${response.message}
+                                    </div >`);
+                    setTimeout(() => {
+                        $("#displayMessage").html("");
+                    }, 5000);
+                });
+            }
+        });
+
+
+        $("#FrmMPDetails").submit(function (event) {
+            event.preventDefault();
+            let data = {}
+            $('#FrmMPDetails input').each(
+                function (index) {
+                    var name = $(this).attr('name');
+                    var value = $(this).val()
+                    if (name != undefined) {
+                        data[name] = value;
+                    }
+                }
+            );
+            var invoiceId = $("#InvoiceId").val();
+
+            if (invoiceId == null || invoiceId <= 0) {
+                $("#displayMessage").html(`<div class="alert alert-danger" role="alert">
+                                    First create invoice.
+                                    </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+                return;
+            }
+            data.InvoiceId = invoiceId;
+            var url = '@Url.Content("~/Invoice/AddMPDetails")';
+            $.post(url, { model: data }, function (response) {
+                $("#myModal").modal('hide');
+                $("#displayMessage").html(`<div class="alert alert-success" role="alert">
+                                    ${response.message}
+                                    </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+                var grid = $('#grid').data('kendoGrid');
+                grid.dataSource.read();
+                $('#FrmMPDetails')[0].reset();
+
+            });
+        });
+
+        $('#expand').click(function (e) {
+            var grid = $("#grid").data("kendoGrid");
+            $(".k-master-row").each(function (index) {
+                grid.expandRow(this);
+            });
+        })
+
+        $('#collapse').click(function (e) {
+            var grid = $("#grid").data("kendoGrid");
+            $(".k-master-row").each(function (index) {
+                grid.collapseRow(this);
+            });
+        })
+        $('#k_button').kendoButton();
+    });
+    $('addBtn').on('click', function () {
+        // do something
+        $("#myModal").modal('show');
+    });
+
+    function showDetails(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        var htmlObj = '';
+        htmlObj += '<label style="font-weight:600;">ZptName: </label>' + dataItem.ZptName;
+        htmlObj += '<br /><label style="font-weight:600;">AgainstCode: </label>' + dataItem.AgainstCode;
+        htmlObj += '<br /><label style="font-weight:600;">MA: </label>' + dataItem.MA;
+        htmlObj += '<br /><label style="font-weight:600;">Original: </label>' + dataItem.Original;
+
+        $("#viewMPDetailsBody").html(htmlObj);
+        $("#viewMPDetailsModal").modal('show');
+
+
+        wnd.content(detailsTemplate(dataItem));
+        wnd.center().open();
+    }
+
+    function getSelectedMPItem(id, value)
+    {
+        if (value)
+        {
+            selectedInvoice.push(id);
+        }
+        else
+        {
+            var index = selectedInvoice.indexOf(id);
+            selectedInvoice.splice(index, 1);
+        }
+    }
+    function getSelectedRGItem(id, value, currentElement) {
+        var mpId = $(currentElement).parent().parent().parent().parent().parent().parent().parent().prev().find('.mpdetails').val();
+
+        if (selectedMPDetails.toString() != mpId) {
+            selectedRGDetails = [];
+            selectedMPDetails = mpId;
+            $("input:checkbox").prop('checked', false);
+            $(currentElement).prop('checked', true);
+            selectedRGDetails.push(id);
+        }
+        else if (value) {
+            selectedRGDetails.push(id);
+        }
+        else {
+            var index = selectedRGDetails.indexOf(id);
+            selectedRGDetails.splice(index, 1);
+        }
+
+    }
+    function checkboxDelete() {
+        if (selectedRGDetails != null && selectedRGDetails.length > 0) {
+            var url = '@Url.Content("~/Invoice/DeleteRGDetails")';
+            $.post(url, { selectedRGIds: selectedRGDetails }, function (response) {
+                    $('#grid').data('kendoGrid').dataSource.read();
+                    $("#displayMessage").html(`<div class="alert alert-success" role="alert">
+                                    ${response.message}
+                                    </div >`);
+                    setTimeout(() => {
+                        $("#displayMessage").html("");
+                    }, 5000);
+                });
+            }
+    }
+</script>

@@ -1,0 +1,260 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model InvoiceModule.Services.Models.Invoice
+<div class="row col-sm-12 border menubarContainer align-content-center">
+    <div class="col-sm-4 row align-content-center justify-content-between border menubarSubContainer">
+        <h5 style="text-align:center">Progress  </h5>
+        @(Html.Kendo().Button().Name("btnStep1").HtmlAttributes(new { type = "button", @class = (Model.Status == 1 ? "k-primary" : "") }).Content("Step 1"))
+        @(Html.Kendo().Button().Name("btnStep2").HtmlAttributes(new { type = "button", @class = (Model.Status == 2 ? "k-primary" : "") }).Content("Step 2"))
+        @(Html.Kendo().Button().Name("btnStep3").HtmlAttributes(new { type = "button", @class = (Model.Status == 3 ? "k-primary" : "") }).Content("Step 3"))
+        @(Html.Kendo().Button().Name("btnStep4").HtmlAttributes(new { type = "button", @class = (Model.Status == 4 ? "k-primary" : "") }).Content("Step 4"))
+    </div>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-2 row align-content-center justify-content-between  menubarSubContainer">
+        @(Html.Kendo().Button()
+                                                                        .Name("iconButton")
+                                                                        .Tag("em")
+                                                                        .Icon("settings")
+                                                                        .Content("<span class='k-icon' title='Refresh'></span>"))
+        @(Html.Kendo().Button().Name("iconButton2").HtmlAttributes(new { type = "button", @class = "" }).Content("!"))
+        @(Html.Kendo().Button()
+                                                               .Name("iconButton3")
+                                                               .Tag("em")
+                                                               .Icon("attachment")
+                                                               .Content("<span class='k-icon' title='Refresh'></span>"))
+        @(Html.Kendo().Button().Name("iconButton4").HtmlAttributes(new { type = "button", @class = "" }).Content("..."))
+    </div>
+    <div class="col-sm-2 row align-content-center justify-content-center">
+        @(Html.Kendo().Button().Name("btnBackToList").HtmlAttributes(new { type = "button", @class = (Model.Status == 4 ? "k-primary" : "" ) }).Content("Back To Invoice"))
+    </div>
+
+</div>
+<div class="clearfix"></div>
+<div id="displayMessage">
+
+</div>
+<form id="InvoiceInfo" kendo-validator="true" class="col-sm-12 row border mainView">
+    <div class="col-sm-3 col justify-content-start border-right">
+        @Html.HiddenFor(x => x.Id, new { id = "InvoiceId" })
+        <h5>RG Info</h5>
+        <div class="form-group">
+            <label for="SWXNumber">SWX Number</label>
+            @(Html.Kendo().TextBoxFor(x => x.SWXNo).HtmlAttributes(new { @class = "textboxWidth", title = "SWX Number", required = "required", validationmessage = "SWX required" }))
+        </div>
+        <div class="form-group">
+            <label for="NB">NB</label>
+            @(Html.Kendo().TextBoxFor(x => x.NB).HtmlAttributes(new { @class = "textboxWidth", title = "NB", required = "required", validationmessage = "NB required" }))
+        </div>
+        <div class="form-group">
+            <label for="InvoiceDate">Invoice Date:</label>
+            @(Html.Kendo().DatePickerFor(x => x.InvoiceDate).HtmlAttributes(new { @class = "textboxWidth", title = "datepicker" }))
+        </div>
+        <div class="form-group">
+            <label for="pwd">RG Type</label>
+            @(Html.Kendo().DropDownListFor(x => x.RGType).BindTo(new List<string>() { "RGType1", "RGType2", "RGType3", "RGType4" }).HtmlAttributes(new { style = "width: 100%" })
+            )
+        </div>
+        <div class="form-group">
+            <label for="pwd">Wahnung</label>
+            @(Html.Kendo().DropDownListFor(x => x.Warning).BindTo(new List<string>() {
+                                                                                                                                  "Wahnung1",
+                                                                                                                                  "Wahnung2",
+                                                                                                                                  "Wahnung3",
+                                                                                                                                  "Wahnung4"
+                                                                                                                              })
+                                                                                                                                                                         .HtmlAttributes(new { style = "width: 100%" })
+            )
+        </div>
+    </div>
+    <div class="col-sm-2 col justify-content-start border-right">
+        <div class=" row col-sm-12 justify-content-between">
+            <div class="form-group">
+                <label for="pwd">BL Info</label>
+                @Html.TextAreaFor(x => x.BLInfo, new { @class = "k-textbox textboxWidth", id = "BLInfo", rows = "4", cols = "12" })
+            </div>
+            <div class="form-group">
+                <label for="pwd">CRG Info</label>
+                @Html.TextAreaFor(x => x.CRGInfo, new { @class = "k-textbox textboxWidth", id = "CRGInfo", rows = "4", cols = "12" })
+            </div>
+            <div class="form-group">
+                <label for="pwd">Comment</label>
+                @Html.TextAreaFor(x => x.Comment, new { @class = "k-textbox textboxWidth", id = "Comment", rows = "5", cols = "12" })
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-2 col justify-content-start border-right">
+        <h5>RG Tales</h5>
+        <div class="form-group">
+            <label for="VATExclusive">MWST Exclusive</label>
+            @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.VATExclusive)
+                                                                                                       .Min(0)
+                                                                                                       .HtmlAttributes(new { style = "width: 100%", title = "MWST Exclusive" })
+            )
+        </div>
+        <div class="form-group">
+            <label for="VATInclusive">MWST Inclusive</label>
+            @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.VATInclusive)
+                                                                                                               .Min(0)
+                                                                                                               .HtmlAttributes(new { style = "width: 100%", title = "MWST Inclusive" })
+            )
+        </div>
+        <div class="form-group">
+            <label for="KalkTotal">KALK Total</label>
+            @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.KalkTotal).Min(0).HtmlAttributes(new { style = "width: 100%", title = "Kalk Total" })
+            )
+        </div>
+        <div class="form-group">
+            <label for="Rounding">Rundung</label>
+            @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.Rounding).Min(0).HtmlAttributes(new { style = "width: 100%", title = "Rundung" })
+            )
+        </div>
+    </div>
+    <div class="col-sm-5 row justify-content-start">
+        <div class="col-sm-7 col justify-content-start">
+            <div class="container">
+                <h5>Einzahlungsschein</h5>
+                <div class="form-group">
+                    <label for="Receiver">Receiver</label>
+                    @(Html.Kendo().TextBoxFor(x => x.Receiver).HtmlAttributes(new { @class = "textboxWidth", title = "Receiver" }))
+                </div>
+                <div class="form-group">
+                    <label for="Account">Konto</label>
+                    @(Html.Kendo().TextBoxFor(x => x.Account).HtmlAttributes(new { @class = "textboxWidth", title = "Konto" }))
+                </div>
+                <div class="form-group">
+                    <label for="Total">Total</label>
+                    @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.Total).Min(0).HtmlAttributes(new { style = "width: 100%", title = "Total" })
+                    )
+                </div>
+                <div class="form-group">
+                    <label for="PayableTo">Zahlbar bis</label>
+                    @(Html.Kendo().TextBoxFor(x => x.PayableTo).HtmlAttributes(new { @class = "textboxWidth", title = "Zahlbar bis" }))
+                </div>
+                <div class="form-group">
+                    <label for="E2Ref">E2Ref</label>
+                    @(Html.Kendo().TextBoxFor(x => x.E2Ref).HtmlAttributes(new { @class = "textboxWidth", title = "E2Ref" }))
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5 col justify-content-start">
+            <div class="form-group">
+                <label for="type">Type</label>
+                @(Html.Kendo().DropDownList().Name("type").BindTo(new List<string>() {"Type1","Type2","Type3","Type4"
+                                                                                                                                                                                                                  }).HtmlAttributes(new { style = "width: 100%" })
+                )
+            </div>
+            <div class="form-group">
+                <label for="TransferDate">Transfer Datum</label>
+                @(Html.Kendo().DatePickerFor(x => x.TransferDate).HtmlAttributes(new { @class = "textboxWidth", title = "datepicker" }))
+            </div>
+            <div class="form-group">
+                <label for="PaymentStatus">Zahlung Status</label>
+                @(Html.Kendo().TextBoxFor(x => x.PaymentStatus).HtmlAttributes(new { @class = "textboxWidth", title = "PaymentStatus" }))
+            </div>
+            <div class="form-group">
+                @(Html.Kendo().Button().Name("Save").HtmlAttributes(new { type = "submit", id = "btnSave" }).Content("Save"))
+            </div>
+        </div>
+    </div>
+</form>
+<!-- Modal -->
+<div id="confirmModel" class="modal fade" role="dialog" style="opacity: 1;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content" style="top: 227px;">
+            <div class="modal-header" style="display: block;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Are you sure you want to save data?</h4>
+            </div>
+           
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"onclick="saveData();">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .textboxWidth {
+        width: 100%;
+    }
+
+    .mainView {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .k-widget.k-tooltip-validation {
+        margin-top: 5px !important;
+    }
+
+    .menubarContainer {
+        height: 60px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+    }
+
+    .menubarSubContainer {
+        height: 50px;
+        margin-left: 5px;
+    }
+    .modal-backdrop {
+        opacity: 0.5 !important;
+    }
+</style>
+
+<script>
+    $(document).ready(() => {
+        $("#InvoiceDate").kendoDatePicker({ format: "dd/MM/yyyy" });
+        $("#TransferDate").kendoDatePicker({ format: "dd/MM/yyyy" });
+        $("#InvoiceInfo").submit(function (event) {
+            event.preventDefault();
+            $("#confirmModel").modal('show');
+
+        });
+
+        $("#btnBackToList").click(() => {
+            window.location.href = '/';
+        });
+    })
+    function saveData() {
+        $("#confirmModel").modal('hide');
+        let data = {}
+        $('#InvoiceInfo input, #InvoiceInfo select, #InvoiceInfo textarea').each(
+            function (index) {
+                var name = $(this).attr('name');
+                var value = $(this).val()
+                if (name != undefined) {
+                    data[name] = value;
+                }
+            }
+        );
+        $.ajax({
+            url: '/invoice/AddUpdateInvoice',
+            type: 'POST',
+            data: data,
+            dataType: "json",
+            success: (result) => {
+                if (data.Id == 0 && result.sucess) {
+                    $("#InvoiceId").val(result.id);
+                }
+                $("#message").text(result.message);
+                $("#displayMessage").html(`<div class="alert alert-success" role="alert">
+                                        ${result.message}
+                                        </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+            },
+            error: (error) => {
+                console.log("err ", error);
+            }
+        })
+    }
+</script>
+
+
+

@@ -1,0 +1,90 @@
+﻿@model InvoiceModule.Models.InvoiceViewModel
+@using Kendo.Mvc.UI
+
+@{
+    ViewData["Title"] = "Invoice";}
+
+<h1>@(Model.IsAdd ? "Add " : "Update") Invoice</h1>
+
+<partial name="_InvoiceFormPartial" model="Model.invoice" />
+
+@if (!Model.IsAdd)
+{
+    <partial name="_AddMPDetailsPartial" model="Model.mPDetails" />
+    <partial name="_AddRGDetailsPartial" model="Model.rGDetails" />
+}
+<div class="col-sm-12 row justify-content-center border-left border-right border-bottom textAreaContainerMainDiv mainView">
+    <div class="form-group row col-sm-11 border textAreaContainerMainDiv">
+        <label for="RGNotes" class="col-sm-1">RG Notes:</label>
+        <div class="col-sm-10 textAreaContainerDiv">
+            @Html.TextAreaFor(x => x.invoice.RGNotes, new { @class = "k-textbox textboxWidth textAreaItems", rows = "2", cols = "12" })
+        </div>
+        <div class="col-sm-1 textAreaItems">
+            @(Html.Kendo().Button().Name("Save").HtmlAttributes(new { type = "button", @class = "", id = "btnRgSave" }).Content("Save"))
+        </div>
+    </div>
+</div>
+<style>
+    .textAreaContainerMainDiv {
+        margin-top: 10px;
+    }
+
+    .textAreaContainerDiv {
+        height: 80px;
+    }
+
+    .textAreaItems {
+        margin-top: 10px;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+        $("#btnRgSave").click(() => {
+            var RGNotes = $("#invoice_RGNotes").val();
+            if ($("#InvoiceId").val() == 0) {
+                $("#displayMessage").html(`<div class="alert alert-danger" role="alert">
+                                    Please save invoice data first
+                                    </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+                return;
+            }
+            else if (RGNotes == "" || RGNotes == null) {
+                $("#displayMessage").html(`<div class="alert alert-danger" role="alert">
+                                    Please enter text in rg notes to save
+                                    </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+                return;
+            }
+            else {
+                $.ajax({
+                    url: '/invoice/UpdateRgNotes',
+                    type: 'POST',
+                    data: {
+                        Id: $("#InvoiceId").val(),
+                        RGNotes: RGNotes
+                    },
+                    dataType: "json",
+                    success: (result) => {
+                        $("#displayMessage").html(`<div class="alert alert-success" role="alert">
+                                    ${result.message}
+                                    </div >`);
+                        setTimeout(() => {
+                            $("#displayMessage").html("");
+                        }, 5000);
+                    },
+                    error: (error) => {
+                        console.log("err ", error);
+                    }
+                })
+            }
+        });
+    });
+</script>
+
+

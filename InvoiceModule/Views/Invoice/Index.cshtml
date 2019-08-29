@@ -1,0 +1,91 @@
+﻿@model List<InvoiceModule.Services.Models.Invoice>
+@using Kendo.Mvc.UI
+
+@{
+    ViewData["Title"] = "Invoice";
+}
+
+<div class="text-center">
+    <h1>Invoices</h1>
+</div>
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@Html.AntiForgeryToken()
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-sm-12">
+        @(Html.Kendo().RadioButton()
+            .Name("User")
+            .Label("User 1")
+            .Checked(true)
+            .Value(true)
+            .HtmlAttributes(new { onchange = "getInvoice(1)" }))
+
+        @(Html.Kendo().RadioButton()
+            .Name("User")
+            .Label("User 2")
+            .Value(false)
+            .HtmlAttributes(new { onchange = "getInvoice(2)" }))
+
+    @(Html.Kendo().Button()
+        .Name("btnAddInvoice")
+        .HtmlAttributes(new { type = "button", @class = "k-primary", style = "float:right;",onclick="addInvoice()" })
+        .Content("Add Invoice"))
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Grid(Model).Name("grid")
+            .Sortable()
+            .Editable()
+            .Scrollable()
+            .Filterable(g => g.Mode(GridFilterMode.Row))
+            //.ToolBar(x => x.Create())
+            .Columns(columns =>
+            {
+                columns.Bound(column => column.Id);
+                columns.Bound(column => column.SWXNo);
+                columns.Bound(column => column.RGType);
+                columns.Bound(column => column.Type);
+                columns.Bound(column => column.Createddate).Format("{0:MM/dd/yyyy}").Title("Created Date");
+                columns.Bound(column => column.InvoiceDate).Format("{0:MM/dd/yyyy}").Title("Invoice Date");
+                columns.Bound(column => column.NB);
+                columns.Bound(column => column.Status);
+                columns.Bound(column => column.Id).ClientTemplate("<a style='color:red;' href='invoice/edit/#=Id#'>Edit</a>");
+            })
+            .DataSource(ds => ds
+                .Ajax()
+                .PageSize(10)
+                .ServerOperation(false)
+            )
+            .Pageable()
+)
+
+<script>
+        function forgeryToken() {
+            return kendo.antiForgeryTokens();
+        }
+
+        function getInvoice(userId) {
+            var url = '@Url.Content("~/Invoice/GetInvoice/")'+ userId;
+            $.get(url, function (data) {
+                if(data != null && data.data != null && data.data.length > 0)
+                {
+                    $("#grid").data("kendoGrid").dataSource.data(data.data);
+                }
+                else
+                {
+                    $("#grid").data("kendoGrid").dataSource.data([]);
+                }
+            });
+        }
+
+    function addInvoice()
+    {
+        var url = '@Url.Content("~/Invoice/Add")';
+        window.location.href = url;
+    }
+
+</script>

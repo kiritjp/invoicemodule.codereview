@@ -1,0 +1,121 @@
+﻿@model InvoiceModule.Services.Models.RGDetails
+<div id="rGDetailsModel" class="modal fade" role="dialog" style="opacity: 1;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content" style="top: 227px;">
+            <div class="modal-header" style="display: block;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add RGDetails</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frmRGDEtails" kendo-validator="true">
+                    <div class="row">
+                        @Html.HiddenFor(x=>x.MPDetailsId,new { @id = "rGDetailsId"})
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>POS</label>
+                                @(Html.Kendo().TextBoxFor(m => m.POS).HtmlAttributes(new { @class = "textboxWidth", title = "POS", required = "required", validationmessage = "POS required" }))
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>MetCode</label>
+                                @(Html.Kendo().TextBoxFor(m => m.SubPOS).HtmlAttributes(new { @class = "textboxWidth", title = "Sub POS"}))
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <label>VAT Exclusive</label>
+                            <div class="form-group">
+                                @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.VATExclusive).Min(0).HtmlAttributes(new { @class = "textboxWidth", title = "VAT Exclusive", id = "RGVATExclusive" }))
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <label>VAT Inclusive</label>
+                            <div class="form-group">
+                                @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.VATInclusive).Min(0).HtmlAttributes(new { @class = "textboxWidth", title = "VAT Inclusive", id = "RGVATInclusive" }))
+                            </div>
+                        </div>
+
+
+
+                        <div class="col-sm-6">
+                            <label>Unit</label>
+                            <div class="form-group">
+                                @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.Unit).Min(0).HtmlAttributes(new { @class = "textboxWidth", title = "RGUnit" }))
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>VAT</label>
+                            <div class="form-group">
+                                @(Html.Kendo().NumericTextBoxFor<decimal>(x => x.VAT).Min(0).HtmlAttributes(new { @class = "textboxWidth", title = "RGVAT" }))
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        @(Html.Kendo().Button().Name("btnSubmitRGDetails").HtmlAttributes(new { type = "submit" }).Content("Add"))
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(() => {
+        $("#frmRGDEtails").submit(function (event) {
+            event.preventDefault();
+            let data = {}
+            $('#frmRGDEtails input').each(
+                function (index) {
+                    var name = $(this).attr('name');
+                    var value = $(this).val()
+                    if (name != undefined) {
+                        data[name] = value;
+                    }
+                }
+            );
+
+            var invoiceId = $("#InvoiceId").val();
+            if (invoiceId == null || invoiceId <= 0) {
+                $("#displayMessage").html(`<div class="alert alert-danger" role="alert">
+                                    First create invoice.
+                                    </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+                return;
+            }
+            data.InvoiceId = 0;
+            var url = '@Url.Content("~/Invoice/AddRGDetails")';
+            $.post(url, { model: data }, function (response) {
+                $("#myModal").modal('hide');
+                $("#displayMessage").html(`<div class="alert alert-success" role="alert">
+                                    ${response.message}
+                                    </div >`);
+                setTimeout(() => {
+                    $("#displayMessage").html("");
+                }, 5000);
+
+                $('#grid_' + $("#rGDetailsId").val()).data('kendoGrid').dataSource.read();
+                $('#frmRGDEtails')[0].reset();
+                $("#rGDetailsModel").modal('hide');
+            });
+        });
+
+       
+    });
+    function openRgModel(element) {
+        let parentElement = $(element).parent().parent().parent().parent().parent().prev().find('.mpdetails').val();
+        $("#rGDetailsModel").modal('show');
+        $("#rGDetailsId").val(parentElement);
+    }
+</script>
